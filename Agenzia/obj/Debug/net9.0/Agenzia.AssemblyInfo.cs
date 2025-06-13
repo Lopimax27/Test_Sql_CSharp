@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Agenzia")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+401bd18fd802035745d53d2e66923253f123f355")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5fcff256d77027591a021880602d471c7d99a844")]
 [assembly: System.Reflection.AssemblyProductAttribute("Agenzia")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Agenzia")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

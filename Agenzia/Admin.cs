@@ -152,9 +152,78 @@ public sealed class Admin
         }
         rdr.Close();
     }
+    
+        public void StampaAttrazioni(MySqlConnection conn,int destId)
+    {
+        string sql = "Select destinazione.citta,a.attrazione_nome,a.descrizione_attrazione,a.prezzo_attrazione from destinazione join attrazione a on destinazione.destinazione_id=a.attrazione_id where destinazione.disponibile=true and destinazione.destinazione_id=@destId;";
+        MySqlCommand cmd = new MySqlCommand(sql, conn);
+        MySqlDataReader rdr = cmd.ExecuteReader();
 
-    private void AggiungiAttrazione(MySqlConnection conn, int destID)
-    { 
+        while (rdr.Read())
+        {
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
+        }
+        rdr.Close();
+    }
 
+private void AggiungiAttrazione(MySqlConnection conn, int destID)
+    {
+        bool continua = true;
+
+        while (continua)
+        {
+            Console.Write("Inserisci nome attrazione: ");
+            string nomeAttrazione = Console.ReadLine();
+
+            if (string.IsNullOrEmpty(nomeAttrazione))
+            {
+                Console.WriteLine("Nome attrazione non può essere vuoto!");
+                continue;
+            }
+
+            Console.Write("Inserisci descrizione attrazione: ");
+            string descrizioneAttrazione = Console.ReadLine();
+
+            Console.Write("Inserisci prezzo attrazione: ");
+            decimal prezzoAttrazione = decimal.Parse(Console.ReadLine());
+
+            // Controlla se l'attrazione esiste già per questa destinazione
+            string sqlCheck = "SELECT COUNT(*) FROM attrazione WHERE destinazione_id = @destId AND attrazione_nome = @nome";
+            MySqlCommand cmdCheck = new MySqlCommand(sqlCheck, conn);
+            cmdCheck.Parameters.AddWithValue("@destId", destID);
+            cmdCheck.Parameters.AddWithValue("@nome", nomeAttrazione);
+
+            int esisteGia = Convert.ToInt32(cmdCheck.ExecuteScalar());
+
+            if (esisteGia > 0)
+            {
+                Console.WriteLine("Attrazione già esistente per questa destinazione!");
+                Console.WriteLine("Vuoi inserire un'altra attrazione? (si/no): ");
+                bool risposta = Console.ReadLine()?.ToLower() == "si";
+                if (!risposta)
+                {
+                    continua = false;
+                }
+                continue;
+            }
+
+            // Inserisce la nuova attrazione
+            string sqlInsert = "INSERT INTO attrazione (destinazione_id, attrazione_nome, descrizione_attrazione, prezzo_attrazione) VALUES (@destId, @nome, @descrizione, @prezzo)";
+            MySqlCommand cmdInsert = new MySqlCommand(sqlInsert, conn);
+            cmdInsert.Parameters.AddWithValue("@destId", destID);
+            cmdInsert.Parameters.AddWithValue("@nome", nomeAttrazione);
+            cmdInsert.Parameters.AddWithValue("@descrizione", descrizioneAttrazione ?? "");
+            cmdInsert.Parameters.AddWithValue("@prezzo", prezzoAttrazione);
+
+            cmdInsert.ExecuteNonQuery();
+            Console.WriteLine("Attrazione aggiunta con successo!");
+
+            // Chiede se vuole aggiungere altre attrazioni
+            Console.WriteLine("Vuoi inserire un'altra attrazione? (si/no): ");
+            bool continuaRisposta = Console.ReadLine()?.ToLower() == "si";
+            continua = continuaRisposta;
+        }
+
+        Console.WriteLine("Operazione completata!");
     }
 }
