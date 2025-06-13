@@ -93,13 +93,17 @@ public sealed class Admin
             }
         } while (true);
 
+        string sqlGetCittaPaeseId = "SELECT paese_id FROM citta WHERE citta_id = @cittaId";
+        MySqlCommand cmdGetPaeseId = new MySqlCommand(sqlGetCittaPaeseId, conn);
+        cmdGetPaeseId.Parameters.AddWithValue("@cittaId", cittaId);
+        int cittaPaeseId = (int)cmdGetPaeseId.ExecuteScalar();
 
         string sql = "Insert into destinazione(paese_id,citta,citta_id, descrizione_destinazione,prezzo) values (@paeseId,@citta,@cittaId, @descrizione,@prezzo);";
         MySqlCommand cmd = new MySqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@cittaId", cittaId);
         cmd.Parameters.AddWithValue("@prezzo", prezzo);
         cmd.Parameters.AddWithValue("@descrizione", descrizione_destinazione);
-        cmd.Parameters.AddWithValue("@paeseId", paeseId);
+        cmd.Parameters.AddWithValue("@paeseId", cittaPaeseId);
         cmd.Parameters.AddWithValue("@citta", citta);
 
         cmd.ExecuteNonQuery();
@@ -138,13 +142,13 @@ public sealed class Admin
     public void StampaInv(MySqlConnection conn)
     {
 
-        string sql = "Select titolo, count(inventario.libro_id) as Quantita from libro join inventario on inventario.libro_id=libro.libro_id group by inventario_id;";
+        string sql = "Select destinazione.citta,paese.paese, destinazione.descrizione_destinazionefrom destinazione join citta on destinazione.citta_id=citta.citta_id join paese on citta.paese_id=paese.paese_id where destinazione.disponibile=true;";
         MySqlCommand cmd = new MySqlCommand(sql, conn);
         MySqlDataReader rdr = cmd.ExecuteReader();
 
         while (rdr.Read())
         {
-            Console.WriteLine(rdr[1] + " -- " + rdr[0]);
+            Console.WriteLine(rdr[0] + " -- " + rdr[1] + " -- " + rdr[2]);
         }
         rdr.Close();
     }
