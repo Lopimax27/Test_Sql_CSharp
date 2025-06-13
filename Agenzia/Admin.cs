@@ -1,5 +1,5 @@
 using MySql.Data.MySqlClient;
-using System;
+
 
 public sealed class Admin
 {
@@ -142,7 +142,7 @@ public sealed class Admin
     public void StampaInv(MySqlConnection conn)
     {
 
-        string sql = "Select destinazione.citta,paese.paese, destinazione.descrizione_destinazionefrom destinazione join citta on destinazione.citta_id=citta.citta_id join paese on citta.paese_id=paese.paese_id where destinazione.disponibile=true;";
+        string sql = "Select destinazione.citta,paese.paese, destinazione.descrizione_destinazione from destinazione join citta on destinazione.citta_id=citta.citta_id join paese on citta.paese_id=paese.paese_id where destinazione.disponibile=true;";
         MySqlCommand cmd = new MySqlCommand(sql, conn);
         MySqlDataReader rdr = cmd.ExecuteReader();
 

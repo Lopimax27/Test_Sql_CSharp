@@ -45,10 +45,10 @@ public class Program
                         password = Console.ReadLine();
 
                         Admin admin = new Admin();
-                        User user = new User();
+                        User user = new User(conn,0);
                         bool isAdmin = AdminLogin(admin, username, password);
-                        bool isUser = UserLogin(conn, username, password);
-
+                        bool isUser = UserLogin(conn, username, password,out int userId);
+                        user = new User(conn,userId);
                         if (isAdmin)
                         {
                             AdminMenu(admin, conn);
@@ -88,7 +88,7 @@ public class Program
         {
             Console.WriteLine("\nMenù admin");
             Console.WriteLine("[1] Aggiungi destinazione o attrazione");
-            Console.WriteLine("[2] Rendi una destinazione non disponibile");
+            Console.WriteLine("[2] Rendi una destinazione non disponibile o disponibile");
             Console.WriteLine("[3] Visualizza tutte le destinazioni disponibili");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
@@ -127,9 +127,9 @@ public class Program
         while (!exit)
         {
             Console.WriteLine("\nMenù user");
-            Console.WriteLine("[1] Aggiungi al carrello");
-            Console.WriteLine("[2] Rimuovi dal carrello");
-            Console.WriteLine("[3] Concludi ordine");
+            Console.WriteLine("[1] Prenota una destinazione");
+            Console.WriteLine("[2] Cancella una prenotazione");
+            Console.WriteLine("[3] Effettua il pagamento");
             Console.WriteLine("[0] Esci");
             Console.Write("Scelta: ");
             int menuAction = int.Parse(Console.ReadLine());
@@ -171,9 +171,9 @@ public class Program
         }
     }
 
-    public static bool UserLogin(MySqlConnection conn, string username, string password)
+    public static bool UserLogin(MySqlConnection conn, string username, string password, out int userId)
     {
-        string sqlUser = "Select u.username, u.password_hash from utente_password u where u.username=@username and u.password_hash=@password_u;";
+        string sqlUser = "Select u.utente_id,u.username, u.password_hash from utente_password u where u.username=@username and u.password_hash=@password_u;";
         MySqlCommand cmdUser = new MySqlCommand(sqlUser, conn);
         cmdUser.Parameters.AddWithValue("@username", username);
         cmdUser.Parameters.AddWithValue("@password_u", password);
@@ -181,11 +181,14 @@ public class Program
 
         if (rdrUser.Read())
         {
+            
+            userId = (int)rdrUser[0];
             rdrUser.Close();
             return true;
         }
         else
         {
+            userId = 0;
             rdrUser.Close();
             return false;
         }
